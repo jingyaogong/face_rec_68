@@ -12,21 +12,25 @@ import time
 import dlib
 import csv
 
+
+device = torch.device(
+    "cuda:0" if torch.cuda.is_available() else "cpu")  # cuda:0代表起始的； #device_id为0,如果直接是cuda,同样默认是从0开始，可以根据实际需要修改起始位置，如cuda:1
+
 # import fy_net as net
 model = net.FAN(2)
 # model_path = './model/model_29_6762.pkl'
 model_path = './good_model/model_80_13525.pkl'
 # model_path = './model/model_11_3387.pkl'
-model.load_state_dict(torch.load(model_path))
+# 加载模型，将其权重和缓冲区映射到CPU设备
+model.load_state_dict(torch.load(model_path, map_location=device))
+
 save_path = './small_out_imgs/'
 if os.path.exists(save_path):
     shutil.rmtree(save_path)
 os.makedirs(save_path)
-device = torch.device(
-    "cuda:0" if torch.cuda.is_available() else "cpu")  # cuda:0代表起始的； #device_id为0,如果直接是cuda,同样默认是从0开始，可以根据实际需要修改起始位置，如cuda:1
 
-model.cuda(device)
-sl1_criterion = nn.SmoothL1Loss().cuda()
+model.to(device)
+sl1_criterion = nn.SmoothL1Loss().to(device)
 
 path_photos_from_camera = "data/data_faces_from_camera/"
 
@@ -110,7 +114,7 @@ def val_test_camera():
             img_tensor = torch.unsqueeze(img_tensor, dim=0)
             img_tensor = torch.unsqueeze(img_tensor, dim=0)
             img_tensor /= 255.
-            img = Variable(img_tensor).cuda()
+            img = Variable(img_tensor).to(device)
 
             start_ = time.time()
             out, reg_outs = model(img)
