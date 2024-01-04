@@ -12,9 +12,13 @@ import time
 import dlib
 import csv
 
-
 device = torch.device(
     "cuda:0" if torch.cuda.is_available() else "cpu")  # cuda:0代表起始的； #device_id为0,如果直接是cuda,同样默认是从0开始，可以根据实际需要修改起始位置，如cuda:1
+
+
+
+
+
 
 # import fy_net as net
 model = net.FAN(2)
